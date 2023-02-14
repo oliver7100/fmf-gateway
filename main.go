@@ -23,9 +23,15 @@ func main() {
 	app.Use(middleware.New(middleware.Config{}))
 
 	userServiceClient, err := clients.NewUserServiceClient(
-		&clients.UserServiceClientConfig{
-			Url: ":8080",
-		},
+		clients.NewConfig(
+			":9000",
+		),
+	)
+
+	authServiceClient, err := clients.NewTokenClient(
+		clients.NewConfig(
+			":8000",
+		),
 	)
 
 	if err != nil {
@@ -35,6 +41,7 @@ func main() {
 	controllers.RegisterAuthController(
 		api,
 		userServiceClient,
+		authServiceClient,
 	)
 
 	panic(app.Listen(":3000"))

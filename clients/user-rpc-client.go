@@ -6,12 +6,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type UserServiceClientConfig struct {
-	Url string
-}
-
-func NewUserServiceClient(config *UserServiceClientConfig) (proto.UserServiceClient, error) {
-	c, err := grpc.Dial(config.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
+func NewUserServiceClient(cfg *clientConfig) (proto.UserServiceClient, error) {
+	c, err := grpc.Dial(cfg.Url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {
 		return nil, err
