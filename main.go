@@ -1,20 +1,30 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"log"
-
+	"github.com/gofiber/fiber/v2"
 	"github.com/oliver7100/fmf-gateway/clients"
-	"github.com/oliver7100/user-service/proto"
+	"github.com/oliver7100/fmf-gateway/controllers"
+	"github.com/oliver7100/fmf-gateway/middleware"
 )
 
 func main() {
-	log.Println("test")
+	app := fiber.New()
 
-	c, err := clients.NewUserServiceClient(
+	api := app.Group("api")
+
+	/* app.Use(
+		jwtWare.New(
+			jwtWare.Config{
+				SigningKey: []byte("RandomString"),
+			},
+		),
+	) */
+
+	app.Use(middleware.New(middleware.Config{}))
+
+	userServiceClient, err := clients.NewUserServiceClient(
 		&clients.UserServiceClientConfig{
-			Url: ":9000",
+			Url: ":8080",
 		},
 	)
 
@@ -22,13 +32,10 @@ func main() {
 		panic(err)
 	}
 
-	res, _ := c.CreateUser(context.Background(), &proto.CreateUserRequest{
-		User: &proto.User{
-			Name:     "Henning",
-			Email:    "Henning@gmail.com",
-			Password: "Hennnnnneee",
-		},
-	})
+	controllers.RegisterAuthController(
+		api,
+		userServiceClient,
+	)
 
-	fmt.Println(res)
+	panic(app.Listen(":3000"))
 }
