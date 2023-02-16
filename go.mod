@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/gofiber/fiber/v2 v2.42.0
 	github.com/oliver7100/token-service v0.0.0-20230214115402-c1d7378392ec
-	github.com/oliver7100/user-service v0.0.0-20230209090931-2765ead6226a
+	github.com/oliver7100/user-service v0.0.0-20230216113125-4293064edbc7
 	google.golang.org/grpc v1.53.0
 )
 
@@ -29,6 +29,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.44.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
+	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/net v0.6.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect

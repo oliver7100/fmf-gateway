@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/gofiber/fiber/v2"
 	TokenProto "github.com/oliver7100/token-service/proto"
@@ -13,6 +13,11 @@ type authController struct {
 	tokenClient TokenProto.AuthServiceClient
 }
 
+type LoginCredentials struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func (controller *authController) Register(c *fiber.Ctx) error {
 	var s UserProto.CreateUserRequest
 
@@ -20,21 +25,42 @@ func (controller *authController) Register(c *fiber.Ctx) error {
 		return fiber.NewError(500, "Post request invalid")
 	}
 
-	fmt.Println(s)
+	r, err := controller.userClient.CreateUser(context.Background(), &s)
 
-	//controller.userClient.CreateUser(context.Background(), &s)
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
 
-	return c.JSON(s)
+	return c.JSON(r)
 }
 
 func (controller *authController) Login(c *fiber.Ctx) error {
-	var s UserProto.GetUserRequest
+	var creds LoginCredentials
 
-	if err := c.BodyParser(&s); err != nil {
+	//var s UserProto.GetUserRequest
+
+	if err := c.BodyParser(&creds); err != nil {
 		return fiber.NewError(500, "Post request invalid")
 	}
 
-	return c.JSON(s)
+	_, err := controller.userClient.CanUserLogin(context.Background(), &UserProto.CanUserLoginRequest{
+		Email:    creds.Email,
+		Password: creds.Password,
+	})
+
+	if err != nil {
+		return fiber.NewError(500, "dadada")
+	}
+
+	token, err := controller.tokenClient.GenerateToken(context.Background(), &TokenProto.GenerateTokenReqeust{
+		Username: creds.Email,
+	})
+
+	if err != nil {
+		return fiber.NewError(500, "Couldnt generate token")
+	}
+
+	return c.JSON(token)
 }
 
 func newAuthController(userClient UserProto.UserServiceClient, tokenClient TokenProto.AuthServiceClient) *authController {
@@ -53,4 +79,5 @@ func RegisterAuthController(router fiber.Router, userClient UserProto.UserServic
 	)
 
 	authRouter.Post("/register", controller.Register)
+	authRouter.Post("/login", controller.Login)
 }
