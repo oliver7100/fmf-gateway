@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"net/mail"
 
 	"github.com/gofiber/fiber/v2"
 	TokenProto "github.com/oliver7100/token-service/proto"
@@ -18,11 +19,20 @@ type LoginCredentials struct {
 	Password string `json:"password"`
 }
 
+func validateMail(m string) bool {
+	_, err := mail.ParseAddress(m)
+	return err == nil
+}
+
 func (controller *authController) Register(c *fiber.Ctx) error {
 	var s UserProto.CreateUserRequest
 
 	if err := c.BodyParser(&s); err != nil {
 		return fiber.NewError(500, "Post request invalid")
+	}
+
+	if ok := validateMail(s.User.Email); !ok {
+		return fiber.NewError(500, "Invalid email")
 	}
 
 	r, err := controller.userClient.CreateUser(context.Background(), &s)
@@ -49,7 +59,7 @@ func (controller *authController) Login(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		return fiber.NewError(500, "dadada")
+		return fiber.NewError(404, "Account not found.")
 	}
 
 	token, err := controller.tokenClient.GenerateToken(context.Background(), &TokenProto.GenerateTokenReqeust{

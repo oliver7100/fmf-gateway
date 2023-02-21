@@ -22,26 +22,33 @@ func main() {
 
 	app.Use(middleware.New(middleware.Config{}))
 
-	userServiceClient, err := clients.NewUserServiceClient(
+	userServiceClient, _ := clients.NewUserServiceClient(
 		clients.NewConfig(
 			":9000",
 		),
 	)
 
-	authServiceClient, err := clients.NewTokenClient(
+	authServiceClient, _ := clients.NewTokenClient(
 		clients.NewConfig(
 			":8000",
 		),
 	)
 
-	if err != nil {
-		panic(err)
-	}
+	advertisementClient, _ := clients.NewAdvertisementClient(
+		clients.NewConfig(
+			":7000",
+		),
+	)
 
 	controllers.RegisterAuthController(
 		api,
 		userServiceClient,
 		authServiceClient,
+	)
+
+	controllers.RegisterAdvertisementController(
+		api,
+		advertisementClient,
 	)
 
 	panic(app.Listen(":3000"))
