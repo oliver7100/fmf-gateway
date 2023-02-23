@@ -4,23 +4,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/oliver7100/fmf-gateway/clients"
 	"github.com/oliver7100/fmf-gateway/controllers"
-	"github.com/oliver7100/fmf-gateway/middleware"
 )
 
 func main() {
 	app := fiber.New()
 
 	api := app.Group("api")
-
-	/* app.Use(
-		jwtWare.New(
-			jwtWare.Config{
-				SigningKey: []byte("RandomString"),
-			},
-		),
-	) */
-
-	app.Use(middleware.New(middleware.Config{}))
 
 	userServiceClient, _ := clients.NewUserServiceClient(
 		clients.NewConfig(
@@ -40,15 +29,30 @@ func main() {
 		),
 	)
 
+	uploadServiceClient, _ := clients.NewUploadServiceClient(
+		clients.NewConfig(
+			":6000",
+		),
+	)
+
 	controllers.RegisterAuthController(
 		api,
 		userServiceClient,
 		authServiceClient,
 	)
 
+	/* app.Use(
+		jwtware.New(
+			jwtware.Config{
+				SigningKey: []byte("secret"),
+			},
+		),
+	) */
+
 	controllers.RegisterAdvertisementController(
 		api,
 		advertisementClient,
+		uploadServiceClient,
 	)
 
 	panic(app.Listen(":3000"))
