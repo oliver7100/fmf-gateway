@@ -2,9 +2,7 @@ package clients
 
 import (
 	"context"
-	"fmt"
 	"io"
-	"log"
 	"mime/multipart"
 	"time"
 
@@ -23,27 +21,27 @@ func NewUploadServiceClient(cfg *clientConfig) (proto.UploadServiceClient, error
 	return proto.NewUploadServiceClient(c), nil
 }
 
-func UploadFile(uploadServiceClient proto.UploadServiceClient, file *multipart.FileHeader) {
+func UploadFile(uploadServiceClient proto.UploadServiceClient, file *multipart.FileHeader) (*string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	stream, err := uploadServiceClient.UploadImage(ctx)
 	if err != nil {
-		log.Fatal("cannot upload image: ", err)
+		return nil, err
 	}
 
 	req := proto.UploadImageRequest{
 		Data: &proto.UploadImageRequest_Info{
 			Info: &proto.ImageInfo{
-				Type: "jpg",
+				Type: "jpeg",
 			},
 		},
 	}
 
 	err = stream.Send(&req)
 	if err != nil {
-		log.Fatal("cannot send image info to server: ", err, stream.RecvMsg(nil))
+		return nil, err
 	}
 
 	buffer := make([]byte, 1024)
@@ -66,5 +64,5 @@ func UploadFile(uploadServiceClient proto.UploadServiceClient, file *multipart.F
 
 	res, _ := stream.CloseAndRecv()
 
-	fmt.Println(res.GetSize())
+	return &res.Uri, nil
 }

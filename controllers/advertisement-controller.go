@@ -23,13 +23,23 @@ type DeleteAdvertisementRequestBody struct {
 func (controller *advertisementController) createAdvertisement(c *fiber.Ctx) error {
 	v := new(proto.Advertisement)
 
-	file, _ := c.FormFile("file")
+	file, err := c.FormFile("file")
 
-	clients.UploadFile(controller.uploadServiceClient, file)
+	if err != nil {
+		fiber.NewError(404, err.Error())
+	}
+
+	uri, err := clients.UploadFile(controller.uploadServiceClient, file)
+
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
 
 	if err := c.BodyParser(v); err != nil {
 		return fiber.NewError(500, err.Error())
 	}
+
+	v.Image = *uri
 
 	res, err := controller.advertisementClient.CreateAdvertisement(context.Background(), v)
 

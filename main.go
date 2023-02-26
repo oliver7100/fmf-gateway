@@ -25,13 +25,13 @@ func main() {
 
 	advertisementClient, _ := clients.NewAdvertisementClient(
 		clients.NewConfig(
-			":7000",
+			":1338",
 		),
 	)
 
 	uploadServiceClient, _ := clients.NewUploadServiceClient(
 		clients.NewConfig(
-			":6000",
+			":1337",
 		),
 	)
 
