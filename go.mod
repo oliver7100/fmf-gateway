@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/gofiber/fiber/v2 v2.42.0
 	github.com/oliver7100/token-service v0.0.0-20230214115402-c1d7378392ec
-	github.com/oliver7100/user-service v0.0.0-20230216113125-4293064edbc7
+	github.com/oliver7100/user-service v0.0.0-20230226210024-43b25dbe0c88
 	google.golang.org/grpc v1.53.0
 )
 

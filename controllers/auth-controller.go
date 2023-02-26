@@ -31,10 +31,6 @@ func (controller *authController) Register(c *fiber.Ctx) error {
 		return fiber.NewError(500, "Post request invalid")
 	}
 
-	if ok := validateMail(s.User.Email); !ok {
-		return fiber.NewError(500, "Invalid email")
-	}
-
 	r, err := controller.userClient.CreateUser(context.Background(), &s)
 
 	if err != nil {
